@@ -19,7 +19,10 @@ def coincidence(lst: Iterable[int | str | float | None] | None = None,
     
     res = [] 
     
-    # пробегаюсь по по списку и 
+    # пробегаюсь по по списку и добавляю в результирующий массив если выполняются все условия
+    # элемент строки - число
+    # его значение не меньше поля start в диапазоне
+    # его значение меньше поля stop в диапазоне
     for obj in lst:
         if isinstance(obj, (float, int)) and obj >= rng.start and obj < rng.stop:
             res.append(obj)
