@@ -31,3 +31,4 @@ if __name__ == '__main__':
     assert sort_list([2, 4, 6, 8]) == [8, 4, 6, 2, 2]
     assert sort_list([1]) == [1, 1]
     assert sort_list([1, 2, 1, 3]) == [3, 2, 3, 1, 1]
+    print('Все тесты пройдены успешно')
