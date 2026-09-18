@@ -16,6 +16,7 @@
 • декоратор должен учитывать как позиционные (*args), так и
 именованные аргументы (**kwargs)
 '''
+from asyncio import ReadTransport
 import time
 from collections.abc import Callable
 from functools import wraps
@@ -34,16 +35,12 @@ class CacheValue:
         return seconds is not None and (time.monotonic() - self.saved_at) >= seconds
 
 
-    def update_time(self) -> None:
-        '''Обновление временной метки при образении к классу'''
-        self.saved_at = time.monotonic()
-
-
 
 
 def cached(max_size: int | None = None, seconds: int | None = None):
-    if not isinstance(max_size, int): max_size = None
-    if not isinstance(seconds, int) or seconds < 0: seconds = None
+    # Валидация переданных аргументов
+    if type(max_size) != int: max_size = None
+    if type(seconds) != int or seconds < 0: seconds = None
 
     def decorator(func: Callable):
         cache_dict: dict[str, CacheValue] = {}
@@ -51,33 +48,48 @@ def cached(max_size: int | None = None, seconds: int | None = None):
         @wraps(func)
         def wrapper(*args, **kwargs):
 
-            key = (args, tuple(sorted(kwargs.items()))) # Формирую ключ для словаря кеша
+            key = repr((args, sorted(kwargs.items()))) # Формирую ключ для словаря кеша
 
-            if key not in cache_dict:
-                res = func(*args, **kwargs) # Сохраняю результат работы
-                cache_dict[key] = CacheValue(result=res) # Создаю новую запись в кеше
-            else:
-                res = cache_dict[key]
-                cache_dict[key].update_time() # Обновляю временную метку
+            value = cache_dict.get(key)
 
-
-            keys_to_delete = [k for k,v in cache_dict.items() if v.is_expired(seconds)]
-            # Удаление кеша с истекшем временем жизни и тд
-            for key in keys_to_delete:
+            # Уддалените кеша, если его время жизни истекло
+            if value is not None:
+                if value.is_expired(seconds=seconds):
                     del cache_dict[key]
+                else:
+                    return value.result
 
-            # Удаление старых записей для очистки кеша
+            result = func(*args, **kwargs)
+
+            if max_size != 0:
+                cache_dict[key] = CacheValue(result=result)
+
+            # Удаление старейших записей при пререполнении кеша
             if max_size is not None:
-                diff = len(cache_dict) - max_size
+                while len(cache_dict) > max_size:
+                    oldest_key = min(cache_dict, key=lambda k: cache_dict[k].saved_at)
+                    del cache_dict[oldest_key]
 
-                if diff > 0:
-                    oldest = sorted(cache_dict.items(), key=lambda kv: kv[1].saved_at)[:diff]
-
-                    for key, _ in oldest:
-                        del cache_dict[key]
-
-
-
-            return res
+            return result
         return wrapper
     return decorator
+
+
+
+if __name__ == '__main__':
+
+    @cached(max_size=3, seconds=10)
+    def slow_function(x):
+        print(f"Вычисляю для {x}...")
+        res = 0
+        for i in range(x):
+            res += i
+        return res
+
+    # Первый вызов — вычисляется
+    print(slow_function(1000000000)) # Вывод: "Вычисляю для 2..." → 4
+    # Повторный вызов с теми же аргументами — берётся из кэша
+    print(slow_function(1000000000)) # Вывод: 4 (без вычисления)
+    # Через 15 секунд кэш устареет, и будет новое вычисление
+    time.sleep(15)
+    print(slow_function(1000000000)) # Вывод: "Вычисляю для 2..." → 4
