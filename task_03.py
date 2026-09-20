@@ -5,19 +5,16 @@ max_odd(array), который определит максимальный не�
 переданном массиве.
 '''
 
-from typing import Iterable
-
-
 def max_odd(lst: list[object]) -> int | None:
-    
-    res: set = set() # В этом множесве буду хранит все неченые числа из lst
-     
+
+    res: set = set() # В этом множестве буду хранит все нечетные числа из lst
+
     for num in lst:
         # Отсекаю все, что не является числом (bool тоже, хоть и наследник int)
-        if type(num) not in (int, float):
+        if not isinstance(num, (float, int)):
             continue
-        
-        # Выбираю только нечетные челые числа и добавляю в res
+
+        # Выбираю только нечетные целые числа и добавляю в res
         if num % 2 == 1:
             res.add(num)
 

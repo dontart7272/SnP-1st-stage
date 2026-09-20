@@ -18,11 +18,12 @@ WrongNumberOfPlayersError
 class WrongNumberOfPlayersError(ValueError):
     '''Класс исключения, вызывается при несоответствии количества игроков (2))'''
 
-    def __init__(self, *args) -> None:
-        self.players: int = args[0]
+    def __init__(self, players: int = 0) -> None:
+        super().__init__(players)
+        self.players: int = players
 
     def __str__(self) -> str:
-        return f"Число игроков отлично от 2 (Передано: self.players)" \
+        return f"Число игроков отлично от 2 (Передано: {self.players})" \
                if self.players \
                else "Число игроков отлично от 2"
 
@@ -31,12 +32,12 @@ class WrongNumberOfPlayersError(ValueError):
 class NoSuchStrategyError(ValueError):
     '''Класс исключения, вызывается при использовании несуществующего хода'''
 
-    def __init__(self, *args) -> None:
-        self.player: str = args[0]
-        self.move: str = args[1]
+    def __init__(self, player: str = '', move: str = '') -> None:
+        self.player: str = player
+        self.move: str = move
 
     def __str__(self) -> str:
-        return f"Передан несуществующий ход для игрока (Возможные ходы: P, S, R; Передано: self.move)" \
+        return f"Передан несуществующий ход для игрока (Возможные ходы: P, S, R; Передано: {self.move})" \
                 if self.player and self.move \
                 else "Число игроков отлично от 2 (Возможные ходы: P, S, R)"
 
@@ -50,7 +51,7 @@ MOVE_INDEX = {
 }
 
 
-def rps_game_winner(moves: List[List[str, str]]) -> str:
+def rps_game_winner(moves: list[list[str]]) -> str:
     '''
     Функция для определения победеителя в игре Камень, Ножницы, Бумага.
 

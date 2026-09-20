@@ -14,7 +14,7 @@ def date_in_future(integer: int) -> str:
     if type(integer) is not int:
         integer = 0
 
-    now = datetime.now() # Запоминаю текущую дату
+    now = datetime.now().astimezone() # Запоминаю текущую дату
     delta = timedelta(days=integer) # Создаю отрезок времени длинною в integer дней
 
     # Из условия не совcем понятно, функция должна возвращать объект datetime или строку

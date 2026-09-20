@@ -83,7 +83,7 @@ class BlockTranspositionCipher:
         order = [sorted(self.__key).index(i) for i in self.__key]
         self.__template = [0] * len(self.__key)
 
-        #
+
         for pos, indx in enumerate(order):
             self.__template[indx] = pos
 

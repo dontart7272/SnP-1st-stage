@@ -16,7 +16,6 @@
 • декоратор должен учитывать как позиционные (*args), так и
 именованные аргументы (**kwargs)
 '''
-from asyncio import ReadTransport
 import time
 from collections.abc import Callable
 from functools import wraps
@@ -86,10 +85,8 @@ if __name__ == '__main__':
             res += i
         return res
 
-    # Первый вызов — вычисляется
-    print(slow_function(1000000000)) # Вывод: "Вычисляю для 2..." → 4
-    # Повторный вызов с теми же аргументами — берётся из кэша
-    print(slow_function(1000000000)) # Вывод: 4 (без вычисления)
-    # Через 15 секунд кэш устареет, и будет новое вычисление
+
+    print(slow_function(1000000000))
+    print(slow_function(1000000000))
     time.sleep(15)
-    print(slow_function(1000000000)) # Вывод: "Вычисляю для 2..." → 4
+    print(slow_function(1000000000))

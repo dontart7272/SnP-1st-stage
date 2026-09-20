@@ -16,17 +16,20 @@
 def connect_dicts(dict1: dict[str, int], dict2: dict[str, int]) -> dict[str, int]:
 
     priority_dict = dict1 if sum(dict1.values()) > sum(dict2.values()) else dict2
+    minor_dict = dict2 if priority_dict is dict1 else dict1
 
-    if priority_dict == dict1:
-        for k,v in dict2:
-            if v < 10 or k in priority_dict.keys():
-                continue
-            priority_dict[k] = v
+    result = {k: v for k, v in priority_dict.items() if v >= 10}
 
-    elif priority_dict == dict2:
-        for k,v in dict1:
-            if v < 10 or k in priority_dict.keys():
-                continue
-            priority_dict[k] = v
+    for k, v in minor_dict.items():
+        if v < 10 or k in result:
+            continue
+        result[k] = v
 
-    return priority_dict
+
+    return dict(sorted(result.items(), key=lambda kv: kv[1]))
+
+
+if __name__ == '__main__':
+    assert connect_dicts({ "a": 2, "b": 12 }, { "c": 11, "e": 5 }) == { "c": 11, "b": 12 }
+    assert connect_dicts({ "a": 13, "b": 9, "d": 11 }, { "c": 12, "a": 15 }) == { 'd': 11, "c": 12, "a": 13 }
+    assert connect_dicts({ "a": 14, "b": 12 }, { "c": 11, "a": 15 }) == { "c": 11, "b": 12, "a": 15 }

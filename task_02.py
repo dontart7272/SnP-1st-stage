@@ -5,20 +5,19 @@ range) для определения элементов из массива list
 должен вернуться пустой массив.
 '''
 
-from typing import Iterable
+from collections.abc import Iterable
 
 
-
-def coincidence(lst: Iterable[int | str | float | None] | None = None, 
+def coincidence(lst: Iterable[int | str | float | None] | None = None,
                 rng: range | None = None
                 ) -> Iterable[int]:
-    
+
     # проверяю, что переданы все аргументы
-    if not all((lst, rng)):
+    if lst is None or rng is None:
         return []
-    
-    res = [] 
-    
+
+    res = []
+
     # пробегаюсь по по списку и добавляю в результирующий массив если выполняются все условия
     # элемент строки - число
     # его значение не меньше поля start в диапазоне
@@ -26,7 +25,7 @@ def coincidence(lst: Iterable[int | str | float | None] | None = None,
     for obj in lst:
         if isinstance(obj, (float, int)) and obj >= rng.start and obj < rng.stop:
             res.append(obj)
-    
+
     return res
 
 
